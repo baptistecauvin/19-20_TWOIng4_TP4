@@ -1,12 +1,16 @@
 var express = require('express');
+const API_KEY = '75c6e2f3';
+const API_URL = 'http://www.omdbapi.com/';
 
 var _ = require('lodash');
+var find = require('lodash.find');
+var axios = require('axios');
 var router = express.Router();
 
 // api key = 75c6e2f3
  let movies = [{
 	  id: "tt0109830",
-	  movie: "Forrest Gump",
+	  movie: "Forrest_Gump",
 	  yearOfRelease: 1994,
 	  duration: 142 , // en minutes,
 	  actors: ["Tom Hanks", "Rebecca Williams", "Sally Field", "Michael Conner Humphreys"],
@@ -67,11 +71,13 @@ router.get('/:id', (req, res) => {
 		message: 'Movie found',
 		movie
 	});
-});
+}); 
 
 /* PUT new movie */
 //Test1 pour PUT
-/*	//Get the data from request
+//Get the data from request
+/*router.put('/', (req, res) => {
+
 	const { movie } = req.body;
 	//Create new unique id
 	const id = _.uniqueId();
@@ -80,7 +86,7 @@ router.get('/:id', (req, res) => {
 	//return message
 	res.json({
 		message: 'Just added ${id}',
-		movie: { movie, id }
+		//movie: { movie, id }
 	});
 });*/
 
@@ -102,30 +108,61 @@ router.get('/:id', (req, res) => {
 					rottenTomatoesScore: req.rottenTomatoesScore,
 				}
 
-			movies.push(movi);
+			movies.push({movi});
 			res.json({
 		message: 'Just added',
 		movie: { movies }
 	});
 });*/
 
+// Test PUT avec axios
+router.put('/', (req, res) => {
+	const { movie } = req.body;
+
+	axios.get(`${API_URL}?t=${movie}&apikey=${API_KEY}`)
+		.then((response) => {
+
+			const movie = {
+				id: _.uniqueId(),
+				movie: response.data.Title,
+				yearOfRelease: response.data.Released,
+				duration: response.data.Runtime,
+				actors: response.data.Actors,
+				poster: response.data.Poster,
+				boxOffice: response.data.BoxOffice,
+				rottenTomatoesScore: response.data.Ratings[2].Value,
+			}
+
+			movies.push(movie);
+
+			res.json({
+				message: `Database updated : `,
+				database: { movies },
+			
+			});
+		})
+		.catch(console.error);
+});
+
 /* UPDATE movie */
 //Ne marche pas bien 
 router.post('/:id', (req, res) => {
 	// Get the :id of the user we want to update from the params of the request
 	const { id } = req.params;
+
 	// Get the new data of the user we want to update from the body of the request
 	const { movie } = req.body;
+
 	//Find in DB
 	const movieToUpdate = _.find(movies, ["id", id]);
 	//Update data with new data (js is by adress)
 	movieToUpdate.movie = movie;
-	movieToUpdate.yearOfRelease = movie;
+	/*movieToUpdate.yearOfRelease = movie;
 	movieToUpdate.duration = movie;
 	movieToUpdate.actors = movie;
 	movieToUpdate.poster = movie;
 	movieToUpdate.boxOffice = movie;
-	movieToUpdate.rottenTomatoesScore = movie;
+	movieToUpdate.rottenTomatoesScore = movie;*/
 
 	//return message
 	res.json({
