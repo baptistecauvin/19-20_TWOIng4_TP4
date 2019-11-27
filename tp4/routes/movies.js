@@ -1,13 +1,13 @@
 var express = require('express');
-const API_KEY = '75c6e2f3';
+const API_KEY = '8de81a2a';
 const API_URL = 'http://www.omdbapi.com/';
 
 var _ = require('lodash');
-var find = require('lodash.find');
+//var find = require('lodash.find');
 var axios = require('axios');
 var router = express.Router();
 
-// api key = 75c6e2f3
+
  let movies = [{
 	  id: "tt0109830",
 	  movie: "Forrest_Gump",
@@ -68,7 +68,7 @@ router.get('/:id', (req, res) => {
 	const movie = _.find(movies, ["id", id]);
 	// Return user
 	res.status(200).json({
-		message: 'Movie found',
+		message: `Movie found`,
 		movie
 	});
 }); 
@@ -85,63 +85,36 @@ router.get('/:id', (req, res) => {
 	movies.push({ movie, id });
 	//return message
 	res.json({
-		message: 'Just added ${id}',
+		message: `Just added ${id}`,
 		//movie: { movie, id }
 	});
 });*/
 
-//test2 pour PUT
-/*router.put('/', (req, res) => {
-	//Get the data from request
-	//const { movie } = req.body;
-	//Create new unique id
-	//const id = _.uniqueId();
 
-	const movi = {
-					id: _.uniqueId(),
-					movie: req.movie,
-					yearOfRelease: req.yearOfRelease,
-					duration: req.duration,
-					actors: req.actors,
-					poster: req.poster,
-					boxOffice: req.boxOffice,
-					rottenTomatoesScore: req.rottenTomatoesScore,
-				}
-
-			movies.push({movi});
-			res.json({
-		message: 'Just added',
-		movie: { movies }
-	});
-});*/
-
-// Test PUT avec axios
+// PUT avec axios fonctionne
 router.put('/', (req, res) => {
 	const { movie } = req.body;
 
-	axios.get(`${API_URL}?t=${movie}&apikey=${API_KEY}`)
+	const id = _.uniqueId();
+
+	axios({
+		method: 'get',
+		url: `http://www.omdbapi.com/?t=${movie}&apikey=${API_KEY}`,
+		responseType: 'json'
+
+	})
 		.then((response) => {
 
-			const movie = {
-				id: _.uniqueId(),
-				movie: response.data.Title,
-				yearOfRelease: response.data.Released,
-				duration: response.data.Runtime,
-				actors: response.data.Actors,
-				poster: response.data.Poster,
-				boxOffice: response.data.BoxOffice,
-				rottenTomatoesScore: response.data.Ratings[2].Value,
-			}
+			const mmovie = response.data;
 
-			movies.push(movie);
+			movies.push({mmovie, id });
 
-			res.json({
-				message: `Database updated : `,
-				database: { movies },
+			res.status(200).json({
+				message: `Nous avons ajouté ${id}`,
+				database: { mmovie },
 			
 			});
-		})
-		.catch(console.error);
+		});
 });
 
 /* UPDATE movie */
@@ -157,16 +130,16 @@ router.post('/:id', (req, res) => {
 	const movieToUpdate = _.find(movies, ["id", id]);
 	//Update data with new data (js is by adress)
 	movieToUpdate.movie = movie;
-	/*movieToUpdate.yearOfRelease = movie;
+	movieToUpdate.yearOfRelease = movie;
 	movieToUpdate.duration = movie;
 	movieToUpdate.actors = movie;
 	movieToUpdate.poster = movie;
 	movieToUpdate.boxOffice = movie;
-	movieToUpdate.rottenTomatoesScore = movie;*/
+	movieToUpdate.rottenTomatoesScore = movie;
 
 	//return message
 	res.json({
-		message: 'Just updated ${id} with ${movie}'
+		message: `Just updated ${id} with ${movie}`
 	});
 });
 
@@ -180,7 +153,7 @@ router.delete('/:id', (req, res) => {
 
 	// Return message
 	res.json({
-		message: 'just removed ${id}'
+		message: `just removed ${id}`
 	});
 });
 
