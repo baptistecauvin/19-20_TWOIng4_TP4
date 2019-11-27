@@ -130,12 +130,7 @@ router.post('/:id', (req, res) => {
 	const movieToUpdate = _.find(movies, ["id", id]);
 	//Update data with new data (js is by adress)
 	movieToUpdate.movie = movie;
-	movieToUpdate.yearOfRelease = movie;
-	movieToUpdate.duration = movie;
-	movieToUpdate.actors = movie;
-	movieToUpdate.poster = movie;
-	movieToUpdate.boxOffice = movie;
-	movieToUpdate.rottenTomatoesScore = movie;
+
 
 	//return message
 	res.json({
