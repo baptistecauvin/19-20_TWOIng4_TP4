@@ -118,10 +118,9 @@ router.put('/', (req, res) => {
 });
 
 /* UPDATE movie */
-//Ne marche pas bien 
 router.post('/:id', (req, res) => {
 	// Get the :id of the user we want to update from the params of the request
-	const { id } = req.params;
+	const { id } = req.params; 
 
 	// Get the new data of the user we want to update from the body of the request
 	const { movie } = req.body;
